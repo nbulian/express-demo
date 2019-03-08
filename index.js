@@ -12,6 +12,7 @@ const app = express();
 
 app.use(express.json()); // Builtin middelware who parse the request body to json > req.body
 app.use(express.urlencoded( { extended: true } )); // Built-in middleware who convert this key=value&key=value into a json object
+app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
 app.use(logger); // Installing my middelware
 
 const courses = [
