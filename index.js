@@ -11,6 +11,7 @@ const express = require('express');
 const app = express();
 
 app.use(express.json()); // Builtin middelware who parse the request body to json > req.body
+app.use(express.urlencoded( { extended: true } )); // Built-in middleware who convert this key=value&key=value into a json object
 app.use(logger); // Installing my middelware
 
 const courses = [
