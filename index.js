@@ -3,6 +3,9 @@
 // config (npm)
 const config = require('config');
 
+// Debug (npm)
+const debug = require('debug')('app:startup');
+
 // Calss Validator
 const Joi = require('joi'); 
 
@@ -29,7 +32,7 @@ console.log('Mail Password ' + config.get('mail.password'));
 
 if (app.get('env') === 'development') {
     app.use(morgan('tiny')); // HTTP request logger
-    console.log('Morgan enabeled...');
+    debug('Morgan enabeled...');
 }
 
 
