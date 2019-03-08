@@ -22,6 +22,9 @@ const logger = require('./logger');
 const express = require('express');
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', './views'); //default
+
 app.use(express.json()); // Builtin middelware who parse the request body to json > req.body
 app.use(express.urlencoded( { extended: true } )); // Built-in middleware who convert this key=value&key=value into a json object
 app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
@@ -35,7 +38,6 @@ if (app.get('env') === 'development') {
     debug('Morgan enabeled...');
 }
 
-
 const courses = [
     { id : 2, name: 'Course 2', teacher: "Sergio Agüero", city: "Manchester"},
     { id : 1, name: 'Course 1', teacher: "Lionel Messi", city: "Barcelona"},
@@ -48,7 +50,7 @@ const courses = [
 ];
 
 app.get('/', (req, res) => {
-    res.send('RESTful APIs with Nodejs & Express');
+    res.render('index', { title: 'My Express App', message: 'RESTful APIs with Nodejs & Express' });
 });
 
 app.get('/api/courses', (req, res) => {
