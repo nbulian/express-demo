@@ -16,7 +16,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 // My middelware
-const logger = require('./logger');
+const logger = require('./middleware/logger');
 
 // Routes
 const courses = require('./routes/courses');
