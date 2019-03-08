@@ -1,5 +1,8 @@
 // Dependencies
 
+// config (npm)
+const config = require('config');
+
 // Calss Validator
 const Joi = require('joi'); 
 
@@ -21,6 +24,8 @@ app.use(express.urlencoded( { extended: true } )); // Built-in middleware who co
 app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
 app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
 app.use(logger); // Installing my middelware
+
+console.log('Mail Password ' + config.get('mail.password'));
 
 if (app.get('env') === 'development') {
     app.use(morgan('tiny')); // HTTP request logger
