@@ -20,8 +20,13 @@ app.use(express.json()); // Builtin middelware who parse the request body to jso
 app.use(express.urlencoded( { extended: true } )); // Built-in middleware who convert this key=value&key=value into a json object
 app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
 app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
-app.use(morgan('tiny')); // HTTP request logger
 app.use(logger); // Installing my middelware
+
+if (app.get('env') === 'development') {
+    app.use(morgan('tiny')); // HTTP request logger
+    console.log('Morgan enabeled...');
+}
+
 
 const courses = [
     { id : 2, name: 'Course 2', teacher: "Sergio Agüero", city: "Manchester"},
