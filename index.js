@@ -2,11 +2,16 @@
 
 // Calss Validator
 const Joi = require('joi'); 
+
+// My middelware
+const logger = require('./logger');
+
 // Build a web server
 const express = require('express');
 const app = express();
 
 app.use(express.json()); // Builtin middelware who parse the request body to json > req.body
+app.use(logger); // Installing my middelware
 
 const courses = [
     { id : 2, name: 'Course 2', teacher: "Sergio Agüero", city: "Manchester"},
