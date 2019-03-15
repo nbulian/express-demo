@@ -6,20 +6,20 @@ const config = require('config');
 // Debug (npm)
 const debug = require('debug')('app:startup');
 
-// Calss Validator
-const Joi = require('joi'); 
-
 // Helmet (npm)
 const helmet = require('helmet');
 
 // Morgan (npm)
 const morgan = require('morgan');
 
+// Mongoose (npm)
+const mongoose = require('mongoose');
+
 // My middelware
 const logger = require('./middleware/logger');
 
 // Routes
-const courses = require('./routes/courses');
+const coursesRoutes = require('./routes/courses');
 const home = require('./routes/home');
 
 // Build a web server
@@ -34,10 +34,14 @@ app.use(express.urlencoded( { extended: true } )); // Built-in middleware who co
 app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
 app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
 app.use(logger); // Installing my middelware
-app.use('/api/courses', courses); // Routes for /api/courses
+app.use('/api/courses', coursesRoutes); // Routes for /api/courses
 app.use('/', home); // Routes for /
 
-console.log('Mail Password ' + config.get('mail.password'));
+mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
+  .then(() => console.log('Connected to MongoDB...'))
+  .catch(err => console.error('Could not connect to MongoDB...'));
+
+//console.log('Mail Password ' + config.get('mail.password'));
 
 if (app.get('env') === 'development') {
     app.use(morgan('tiny')); // HTTP request logger

@@ -1,100 +1,110 @@
+const mongoose = require('mongoose');
 const express = require('express');
+const Joi = require('joi'); // Calss Validator
 const router = express.Router();
 
-const courses = [
-    { id : 2, name: 'Course 2', teacher: "Sergio Agüero", city: "Manchester"},
-    { id : 1, name: 'Course 1', teacher: "Lionel Messi", city: "Barcelona"},
-    { id : 3, name: 'Course 3', teacher: "Paulo Dybala", city: "Turín"},
-    { id : 5, name: 'Course 5', teacher: "Ángel Di María", city: "París"},
-    { id : 4, name: 'Course 4', teacher: "Nicolás Tagliafico", city: "Amsterdam"},
-    { id : 6, name: 'Course 6', teacher: "Maximiliano Meza", city: "Monterrey"},
-    { id : 8, name: 'Course 8', teacher: "Ezequiel Barco", city: "Atlanta"},
-    { id : 7, name: 'Course 7', teacher: "Emiliano Rigoni", city: "San Petersburgo"},
-];
+const CourseModel = mongoose.model('Course', new mongoose.Schema({
+  name:  {
+      type: String,
+      require: true,
+      minlength: 5,
+      maxlength: 50
+  }, 
+  author:  {
+      type: String,
+      require: true,
+      minlength: 5,
+      maxlength: 50
+  }, 
+  city:  {
+      type: String,
+      require: true,
+      minlength: 5,
+      maxlength: 50
+  },
+  tags: [ String ],
+  date: { type: Date, default: Date.now },
+  isPublished: { type: Boolean, default: false },
+  price: {
+    type: Number,
+    required: function() { return this.isPublished; },
+    min: 5,
+    max: 200,
+    default: 5,
+    get: v => Math.round(v),
+    set: v => Math.round(v)
+  }
+}));
 
-router.get('/', (req, res) => {
-    // To read query string parameters (?sortBy=name)
-    const sortBy = req.query.sortBy; // Return the courses  
-    
-    if ( sortBy ) {
-      courses.sort(dynamicSort(sortBy));
+router.get('/', async (req, res) => {
+  const sortBy = req.query.sortBy;
+  const courses = await CourseModel.find().sort(sortBy);
+  res.send(courses);
+});
+
+router.get('/:id', async (req, res) => { 
+  await CourseModel.findById(req.params.id, function (err, course) {
+    if (err) {
+      return res.status(500).send('Something went wrong please try again.');
+    } else {
+      if(!course) return res.status(404).send('The course with the given ID was not found.');
+      return res.send(course);
     }
-
-    res.send(courses);
+  });
 });
 
-router.get('/:id', (req, res) => {
-  const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) return res.status(404).send('The course was not found.');
-  res.send(course);
-});
-
-router.post('/', (req, res) => {
-
-  const {error} = validateCourse(req.body); //Object destructuring > {error} equivalent to result.error
-
-  if ( error ) return res.status(400).send(error.details[0].message);
-
-  const course = {
-      id: courses.length + 1,
-      name: req.body.name,
-      teacher: req.body.teacher,
-      city: req.body.city
-  };
-  courses.push(course);
-  res.send(course);
-});
-
-router.put('/:id', (req, res) => {
-  const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) return res.status(404).send('The course was not found.');
-
+router.post('/', async (req, res) => {
   const {error} = validateCourse(req.body); //Object destructuring > {error} equivalent to result.error
   if ( error ) return res.status(400).send(error.details[0].message);
 
-  course.name = req.body.name;
-  course.teacher = req.body.teacher;
-  course.city = req.body.city;
+  let course = new CourseModel({
+    name: req.body.name,
+    author: req.body.author, 
+    city: req.body.city,
+    tags: req.body.tags,
+    isPublished: req.body.isPublished,
+    date: req.body.date
+  });
 
+  course = await course.save();
   res.send(course);
 });
 
-router.delete('/:id', (req, res) => {
-  const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) return res.status(404).send('The course was not found.');
+router.put('/:id', async (req, res) => {
+  const {error} = validateCourse(req.body); //Object destructuring > {error} equivalent to result.error
+  if ( error ) return res.status(400).send(error.details[0].message);
 
-  const index = courses.indexOf(course);
-  courses.splice(index, 1);
+  await CourseModel.findOneAndUpdate({ _id: req.params.id }, req.body, function (err, course) {
+    if (err) {
+      return res.status(500).send('Something went wrong please try again.');
+    } else {
+      if(!course) return res.status(404).send('The course with the given ID was not found.');
+      return res.send(course);
+    }
+  });
+});
 
-  res.send(course);
+router.delete('/:id', async (req, res) => {
+  await CourseModel.findOneAndDelete({ _id: req.params.id }, function (err, course) {
+    if (err) {
+      res.status(404).send('The course with the given ID was not found.');
+    } else {
+      res.send(course);
+    }
+  });
 });
 
 function validateCourse(course) {
   const schema = {
-      name: Joi.string().min(3).required(),
-      teacher: Joi.string().min(3).required(),
-      city: Joi.string().min(3).required()
+    name: Joi.string().min(5).max(50).required(),
+    author: Joi.string().min(5).max(50).required(),
+    city: Joi.string().min(5).max(50).required(),
+    tags: Joi.array().items(Joi.string()),
+    isPublished: Joi.boolean().optional().default(false),
+    date: Joi.date(),
+    price: Joi.number().optional()
   };
-
   return Joi.validate(course, schema);    
-}
-
-//https://ourcodeworld.com/articles/read/764/how-to-sort-alphabetically-an-array-of-objects-by-key-in-javascript
-function dynamicSort(property) {
-  var sortOrder = 1;
-
-  if(property[0] === "-") {
-      sortOrder = -1;
-      property = property.substr(1);
-  }
-
-  return function (a,b) {
-      if(sortOrder == -1){
-          return b[property].localeCompare(a[property]);
-      }else{
-          return a[property].localeCompare(b[property]);
-      }        
-  }
 }
 
 module.exports = router;
