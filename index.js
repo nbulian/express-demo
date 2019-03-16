@@ -20,6 +20,7 @@ const logger = require('./middleware/logger');
 
 // Routes
 const coursesRoutes = require('./routes/courses');
+const authorsRoutes = require('./routes/authors');
 const home = require('./routes/home');
 
 // Build a web server
@@ -35,6 +36,7 @@ app.use(express.static('public')); // Built-in middleware who published the stat
 app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
 app.use(logger); // Installing my middelware
 app.use('/api/courses', coursesRoutes); // Routes for /api/courses
+app.use('/api/authors', authorsRoutes); // Routes for /api/authors
 app.use('/', home); // Routes for /
 
 mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
