@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const {UserModel, validateUser} = require('../models/user');
 const express = require('express');
 const router = express.Router();
@@ -12,18 +13,13 @@ router.post('/', async (req, res) => {
       } else {
         if ( user ) return res.status(400).send('User already registered');
 
-        user = new UserModel({
-          name: req.body.name,
-          email: req.body.email, 
-          password: req.body.password
-        });
+        user = new UserModel(_.pick(req.body, ['name', 'email', 'password']));
 
         user.save();
 
-        res.send({
-          name: user.name,
-          email: user.email
-        });
+        res.send(
+          _.pick(user, ['_id', 'name', 'email'])
+        );
       }      
     });
 });
