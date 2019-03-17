@@ -1,5 +1,9 @@
 // Dependencies
 
+// Calss Validator
+const Joi = require('joi');
+Joi.objectId = require('joi-objectid')(Joi);
+
 // config (npm)
 const config = require('config');
 
@@ -29,7 +33,6 @@ const app = express();
 
 app.set('view engine', 'pug');
 app.set('views', './views'); //default
-
 app.use(express.json()); // Builtin middelware who parse the request body to json > req.body
 app.use(express.urlencoded( { extended: true } )); // Built-in middleware who convert this key=value&key=value into a json object
 app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
