@@ -25,6 +25,7 @@ const logger = require('./middleware/logger');
 // Routes
 const coursesRoutes = require('./routes/courses');
 const authorsRoutes = require('./routes/authors');
+const usersRoutes = require('./routes/users');
 const home = require('./routes/home');
 
 // Build a web server
@@ -40,6 +41,7 @@ app.use(helmet()); // Helmet helps you secure your Express apps by setting vario
 app.use(logger); // Installing my middelware
 app.use('/api/courses', coursesRoutes); // Routes for /api/courses
 app.use('/api/authors', authorsRoutes); // Routes for /api/authors
+app.use('/api/users', usersRoutes); // Routes for /api/users
 app.use('/', home); // Routes for /
 
 mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
