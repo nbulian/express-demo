@@ -1,7 +1,7 @@
 const Joi = require('joi'); // Calss Validator
 const mongoose = require('mongoose');
 
-const AuthorModel = mongoose.model('Author', new mongoose.Schema({
+const authorSchema = new mongoose.Schema({
     name:  {
         type: String,
         require: true,
@@ -17,7 +17,9 @@ const AuthorModel = mongoose.model('Author', new mongoose.Schema({
         minlength: 3,
         maxlength: 50
     }, 
-}));
+});
+
+const AuthorModel = mongoose.model('Author', authorSchema);
 
 function validateAuthor(author) {
     const schema = {
@@ -28,5 +30,6 @@ function validateAuthor(author) {
     return Joi.validate(author, schema);    
 }
 
+exports.authorSchema = authorSchema;
 exports.AuthorModel = AuthorModel;
 exports.validateAuthor = validateAuthor;
