@@ -1,4 +1,5 @@
 const Joi = require('joi'); // Calss Validator
+Joi.objectId = require('joi-objectid')(Joi);
 const mongoose = require('mongoose');
 const {authorSchema} = require('./author');
 
@@ -10,11 +11,6 @@ const CourseModel = mongoose.model('Course', new mongoose.Schema({
         minlength: 5,
         maxlength: 50
     }, 
-/*     author:  {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Author',
-        required: true
-    },  */
     author:  {
         type: authorSchema,
         required: true
@@ -42,7 +38,7 @@ const CourseModel = mongoose.model('Course', new mongoose.Schema({
 function validateCourse(course) {
     const schema = {
         name: Joi.string().min(5).max(50).required(),
-        authorId: Joi.string().min(24).max(24).required(),
+        authorId: Joi.objectId().required(),
         city: Joi.string().min(5).max(50).required(),
         tags: Joi.array().items(Joi.string()),
         isPublished: Joi.boolean().optional().default(false),
