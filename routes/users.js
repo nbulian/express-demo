@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const {UserModel, validateUser} = require('../models/user');
 const express = require('express');
@@ -7,26 +8,30 @@ router.post('/', async (req, res) => {
     const {error} = validateUser(req.body); //Object destructuring > {error} equivalent to result.error
     if ( error ) return res.status(400).send(error.details[0].message);
 
-    UserModel.findOne({ email: req.body.email }, function (err, user) {
+     let user = await UserModel.findOne({ email: req.body.email }, function (err, user) {
       if (err) {
         return res.status(500).send('Something went wrong please try again.');
       } else {
         if ( user ) return res.status(400).send('User already registered');
-
-        user = new UserModel(_.pick(req.body, ['name', 'email', 'password']));
-
-        user.save();
-
-        res.send(
-          _.pick(user, ['_id', 'name', 'email'])
-        );
       }      
     });
+
+    user = new UserModel(_.pick(req.body, ['name', 'email', 'password']));
+
+    const salt = await bcrypt.genSalt(10);
+
+    user.password = await bcrypt.hash(req.body.password, salt);
+
+    user = await user.save();
+
+    res.send(
+      _.pick(user, ['_id', 'name', 'email'])
+    );
 });
 
 router.get('/', async (req, res) => {
     const sortBy = req.query.sortBy;
-    const users = await UserModel.find().sort(sortBy);
+    const users = await UserModel.find().select('_id name email').sort(sortBy);
     res.send(users);
 });
 
@@ -38,21 +43,32 @@ router.get('/:id', async (req, res) => {
         if(!user) return res.status(404).send('The user with the given ID was not found.');
         return res.send(user);
       }
-    });
+    }).select('_id name email');
 });
 
 router.put('/:id', async (req, res) => {
-    const {error} = validateUser(req.body); //Object destructuring > {error} equivalent to result.error
-    if ( error ) return res.status(400).send(error.details[0].message);
-  
-    await UserModel.findOneAndUpdate({ _id: req.params.id }, req.body, function (err, author) {
-      if (err) {
-        return res.status(500).send('Something went wrong please try again.');
-      } else {
-        if(!user) return res.status(404).send('The user with the given ID was not found.');
-        return res.send(user);
-      }
-    });
+  const {error} = validateUser(req.body); //Object destructuring > {error} equivalent to result.error
+  if ( error ) return res.status(400).send(error.details[0].message);
+
+  let user = await UserModel.findOne({ _id: req.params.id }, function (err, user) {
+    if (err) {
+      return res.status(500).send('Something went wrong please try again.');
+    } else {
+      if(!user) return res.status(404).send('The user with the given ID was not found.');
+    }
+  });
+
+  const salt = await bcrypt.genSalt(10);
+
+  user.name = req.body.name;
+  //user.email = req.body.email;
+  user.password = await bcrypt.hash(req.body.password, salt);
+
+  user.save();
+
+  res.send(
+    _.pick(user, ['_id', 'name', 'email'])
+  );
 });
 
 router.delete('/:id', async (req, res) => {
