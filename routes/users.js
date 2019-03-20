@@ -39,17 +39,16 @@ router.get('/', async (req, res) => {
     res.send(users);
 });
 
-router.get('/:id', async (req, res) => { 
-    await UserModel.findById(req.params.id, function (err, user) {
+router.get('/me', auth, async (req, res) => { 
+    await UserModel.findById(req.user._id, function (err, user) {
       if (err) {
         return res.status(500).send('Something went wrong please try again.');
       } else {
         if(!user) return res.status(404).send('The user with the given ID was not found.');
         return res.send(user);
       }
-    }).select('_id name email');
+    }).select('_id name email'); 
 });
-
 router.put('/:id', auth, async (req, res) => {
   const {error} = validateUser(req.body); //Object destructuring > {error} equivalent to result.error
   if ( error ) return res.status(400).send(error.details[0].message);
