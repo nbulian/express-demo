@@ -26,11 +26,17 @@ const logger = require('./middleware/logger');
 const coursesRoutes = require('./routes/courses');
 const authorsRoutes = require('./routes/authors');
 const usersRoutes = require('./routes/users');
+const authRoutes = require('./routes/auth');
 const home = require('./routes/home');
 
 // Build a web server
 const express = require('express');
 const app = express();
+
+if (!config.get('jwtPrivateKey')) {
+  console.log('FATAL ERROR: jwtPrivateKey is not defined');
+  process.exit(1);
+}
 
 app.set('view engine', 'pug');
 app.set('views', './views'); //default
@@ -42,6 +48,7 @@ app.use(logger); // Installing my middelware
 app.use('/api/courses', coursesRoutes); // Routes for /api/courses
 app.use('/api/authors', authorsRoutes); // Routes for /api/authors
 app.use('/api/users', usersRoutes); // Routes for /api/users
+app.use('/api/auth', authRoutes); // Routes for /api/auth
 app.use('/', home); // Routes for /
 
 mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
