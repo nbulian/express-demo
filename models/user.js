@@ -1,3 +1,5 @@
+const config = require('config');
+const jwt = require('jsonwebtoken');
 const Joi = require('joi'); // Calss Validator
 const mongoose = require('mongoose');
 
@@ -22,6 +24,10 @@ const userSchema = new mongoose.Schema({
         maxlength: 1024
     }, 
 });
+
+userSchema.methods.generateAuthToken = function() {
+    return jwt.sign({ _id: this.id }, config.get('jwtPrivateKey'));
+}
 
 const UserModel = mongoose.model('User', userSchema);
 
