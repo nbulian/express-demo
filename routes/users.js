@@ -1,4 +1,5 @@
 const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const {UserModel, validateUser} = require('../models/user');
@@ -49,6 +50,7 @@ router.get('/me', auth, async (req, res) => {
       }
     }).select('_id name email'); 
 });
+
 router.put('/:id', auth, async (req, res) => {
   const {error} = validateUser(req.body); //Object destructuring > {error} equivalent to result.error
   if ( error ) return res.status(400).send(error.details[0].message);
@@ -74,7 +76,7 @@ router.put('/:id', auth, async (req, res) => {
   );
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', [auth, admin], async (req, res) => {
     await UserModel.findOneAndDelete({ _id: req.params.id }, function (err, user) {
         if (err) {
           return res.status(500).send('Something went wrong please try again.');
