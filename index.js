@@ -1,5 +1,8 @@
 // Dependencies
 
+//Express Async Errors
+require('express-async-errors');
+
 // Calss Validator
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
@@ -18,9 +21,6 @@ const morgan = require('morgan');
 
 // Mongoose (npm)
 const mongoose = require('mongoose');
-
-// My middelware
-const logger = require('./middleware/logger');
 
 // My error middelware
 const error = require('./middleware/error');
@@ -47,7 +47,6 @@ app.use(express.json()); // Builtin middelware who parse the request body to jso
 app.use(express.urlencoded( { extended: true } )); // Built-in middleware who convert this key=value&key=value into a json object
 app.use(express.static('public')); // Built-in middleware who published the static content in "public" folder
 app.use(helmet()); // Helmet helps you secure your Express apps by setting various HTTP headers.
-app.use(logger); // Installing my middelware
 app.use('/api/courses', coursesRoutes); // Routes for /api/courses
 app.use('/api/authors', authorsRoutes); // Routes for /api/authors
 app.use('/api/users', usersRoutes); // Routes for /api/users

@@ -1,19 +1,18 @@
-const asyncMiddleware = require('../middleware/async');
 const {CourseModel, validateCourse} = require('../models/course');
 const {AuthorModel} = require('../models/author');
 const express = require('express');
 const router = express.Router();
 
-router.get('/', asyncMiddleware( async(req, res) => {
+router.get('/', async(req, res) => {
   const sortBy = req.query.sortBy;
   const courses = await CourseModel
     .find()
     .populate('author', 'name -_id')
     .sort(sortBy);
   res.send(courses);
-}));
+});
 
-router.get('/:id', asyncMiddleware( async (req, res) => { 
+router.get('/:id', async (req, res) => { 
   await CourseModel.findById(req.params.id, function (err, course) {
     if (err) {
       return res.status(500).send('Something went wrong please try again.');
@@ -23,7 +22,7 @@ router.get('/:id', asyncMiddleware( async (req, res) => {
     }
   })
   .populate('author', 'name -_id');
-}));
+});
 
 router.post('/', async (req, res) => {
   const {error} = validateCourse(req.body); //Object destructuring > {error} equivalent to result.error
@@ -74,7 +73,7 @@ router.put('/:id', async (req, res) => {
   });
 });
 
-router.delete('/:id', asyncMiddleware(async (req, res) => {
+router.delete('/:id', async (req, res) => {
   await CourseModel.findOneAndDelete({ _id: req.params.id }, function (err, course) {
     if (err) {
       res.status(404).send('The course with the given ID was not found.');
@@ -82,6 +81,6 @@ router.delete('/:id', asyncMiddleware(async (req, res) => {
       res.send(course);
     }
   });
-}));
+});
 
 module.exports = router;
