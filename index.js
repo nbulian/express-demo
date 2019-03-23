@@ -23,7 +23,8 @@ const morgan = require('morgan');
 const mongoose = require('mongoose');
 
 // My error middelware
-const error = require('./middleware/error');
+const logger = require('./middleware/logger'); //General logs
+const error = require('./middleware/error'); //Routes log
 
 // Routes
 const coursesRoutes = require('./routes/courses');
@@ -54,6 +55,12 @@ app.use('/api/auth', authRoutes); // Routes for /api/auth
 app.use('/', home); // Routes for /
 
 app.use(error);
+
+process.on('uncaughtException', (ex) => {
+  logger.error(ex.message, ex);
+});
+
+//throw new Error('Somehing went wrong durng startup!');
 
 mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
   .then(() => console.log('Connected to MongoDB...'))
