@@ -22,6 +22,9 @@ const mongoose = require('mongoose');
 // My middelware
 const logger = require('./middleware/logger');
 
+// My error middelware
+const error = require('./middleware/error');
+
 // Routes
 const coursesRoutes = require('./routes/courses');
 const authorsRoutes = require('./routes/authors');
@@ -50,6 +53,8 @@ app.use('/api/authors', authorsRoutes); // Routes for /api/authors
 app.use('/api/users', usersRoutes); // Routes for /api/users
 app.use('/api/auth', authRoutes); // Routes for /api/auth
 app.use('/', home); // Routes for /
+
+app.use(error);
 
 mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
   .then(() => console.log('Connected to MongoDB...'))
