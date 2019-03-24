@@ -3,10 +3,6 @@
 //Express Async Errors
 require('express-async-errors');
 
-// Calss Validator
-const Joi = require('joi');
-Joi.objectId = require('joi-objectid')(Joi);
-
 // Debug (npm)
 const debug = require('debug')('app:startup');
 
@@ -22,6 +18,7 @@ const app = express();
 require('./startup/routes')(app);
 require('./startup/db')(logger);
 require('./startup/config')();
+require('./startup/validation')();
 
 app.set('view engine', 'pug');
 app.set('views', './views'); //default
