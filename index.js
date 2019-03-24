@@ -60,7 +60,9 @@ process.on('uncaughtException', (ex) => {
   logger.error(ex.message, ex);
 });
 
-//throw new Error('Somehing went wrong durng startup!');
+process.on('unhandledRejection', (ex) => {
+  throw ex;
+});
 
 mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
   .then(() => console.log('Connected to MongoDB...'))
