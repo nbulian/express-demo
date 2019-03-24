@@ -1,16 +1,8 @@
 // Dependencies
-
-//Express Async Errors
-require('express-async-errors');
-
-// Debug (npm)
-const debug = require('debug')('app:startup');
-
-// Morgan (npm)
-const morgan = require('morgan');
-
-// My error middelware
-const logger = require('./middleware/logger'); //General logs
+require('express-async-errors'); //Express Async Errors
+const debug = require('debug')('app:startup'); // Debug (npm)
+const morgan = require('morgan'); // Morgan (npm)
+const logger = require('./middleware/logger'); //My error middelware for general logs
 
 // Build a web server
 const express = require('express');
@@ -20,7 +12,6 @@ require('./startup/db')(logger);
 require('./startup/config')();
 require('./startup/validation')();
 
-app.set('view engine', 'pug');
 app.set('views', './views'); //default
 
 process.on('unhandledRejection', (ex) => {
@@ -29,10 +20,10 @@ process.on('unhandledRejection', (ex) => {
 
 if (app.get('env') === 'development') {
     app.use(morgan('tiny')); // HTTP request logger
-    debug('Morgan enabeled...');
+    logger.info('Morgan enabeled...');
 }
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => { 
-    console.log(`Listening on port ${port}...`);
+  logger.info(`Listening on port ${port}...`);
 });
