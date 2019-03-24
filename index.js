@@ -33,15 +33,9 @@ if (!config.get('jwtPrivateKey')) {
 app.set('view engine', 'pug');
 app.set('views', './views'); //default
 
-process.on('uncaughtException', (ex) => {
-  logger.error(ex.message, ex);
-});
-
 process.on('unhandledRejection', (ex) => {
   throw ex;
 });
-
-//console.log('Mail Password ' + config.get('mail.password'));
 
 if (app.get('env') === 'development') {
     app.use(morgan('tiny')); // HTTP request logger
