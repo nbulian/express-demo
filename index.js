@@ -16,9 +16,6 @@ const debug = require('debug')('app:startup');
 // Morgan (npm)
 const morgan = require('morgan');
 
-// Mongoose (npm)
-const mongoose = require('mongoose');
-
 // My error middelware
 const logger = require('./middleware/logger'); //General logs
 
@@ -26,6 +23,7 @@ const logger = require('./middleware/logger'); //General logs
 const express = require('express');
 const app = express();
 require('./startup/routes')(app);
+require('./startup/db')(logger);
 
 if (!config.get('jwtPrivateKey')) {
   console.log('FATAL ERROR: jwtPrivateKey is not defined');
@@ -42,10 +40,6 @@ process.on('uncaughtException', (ex) => {
 process.on('unhandledRejection', (ex) => {
   throw ex;
 });
-
-mongoose.connect('mongodb://localhost/playground', { useNewUrlParser: true })
-  .then(() => console.log('Connected to MongoDB...'))
-  .catch(err => console.error('Could not connect to MongoDB...'));
 
 //console.log('Mail Password ' + config.get('mail.password'));
 
